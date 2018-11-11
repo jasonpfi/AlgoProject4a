@@ -1,5 +1,4 @@
 // Declarations and functions for project #4
-
 #include <iostream>
 #include <limits.h>
 #include "d_matrix.h"
@@ -37,6 +36,7 @@ class board
       void setCell(int i, int j, int val);
       void clearCell(int i, int j);
       bool isSolved();
+	  void printConflicts() {}; // TODO
 
    private:
 
@@ -46,9 +46,9 @@ class board
       matrix<ValueType> value;
 
       // Conflict Vectors
-      vector<vector<bool>> rows;
-      vector<vector<bool>> cols;
-      vector<vector<bool>> squares;
+      matrix<bool> rows;
+      matrix<bool> cols;
+      matrix<bool> squares;
 
 };
 
@@ -70,9 +70,9 @@ bool board::isSolved()
       for (int j = 1; j <= BoardSize; j++)
       {
          boardFull = boardFull && value[i][j] != Blank;
-         nowRowConflict = noRowConflict && rows.at(i - 1).at(j - 1);
-         nowColConflict = noColConflict && cols.at(i - 1).at(j - 1);
-         nowSqConflict = noSqConflict && squares.at(i - 1).at(j - 1);
+         noRowConflict = noRowConflict && rows[i - 1].at(j - 1);
+         noColConflict = noColConflict && cols[i - 1].at(j - 1);
+         noSqConflict = noSqConflict && squares[i - 1].at(j - 1);
       }
    }
 
@@ -98,9 +98,9 @@ void board::initialize(ifstream &fin)
 
    for (int i = 1; i <= BoardSize; i++)
    {
-      cols.at(i - 1).resize(9);
-      squares.at(i - 1).resize(9);
-      rows.at(i - 1).resize(9);
+      cols.resize(9,9);
+      squares.resize(9,9);
+      rows.resize(9,9);
 
       for (int j = 1; j <= BoardSize; j++)
 	   {
@@ -120,7 +120,7 @@ int squareNumber(int i, int j)
    // Note that (int) i/SquareSize and (int) j/SquareSize are the x-y
    // coordinates of the square that i,j is in.
 
-   return SquareSize * ((i-1)/SquareSize) + (j-1)/SquareSize + 1;
+   return SquareSize * (i-1)/SquareSize + (j)%SquareSize;
 }
 
 ostream &operator<<(ostream &ostr, vector<int> &v)
@@ -129,6 +129,7 @@ ostream &operator<<(ostream &ostr, vector<int> &v)
    for (int i = 0; i < v.size(); i++)
       ostr << v[i] << " ";
    cout << endl;
+   return ostr;
 }
 
 void board::clearCell(int i, int j)
@@ -138,10 +139,10 @@ void board::clearCell(int i, int j)
    if (i >= 1 && i <= BoardSize && j >= 1 && j <= BoardSize)
    {
       ValueType tmp = value[i][j];
-      value[i][j] = Blank;
-      cols.at(i - 1).at(tmp) = false;
-      rows.at(j - 1).at(tmp) = false;
-      squares.at(squareNumber(i, j)).at(tmp) = false;
+      value[i - 1][j - 1] = Blank;
+      cols[i - 1].at(tmp) = false;
+      rows[j - 1].at(tmp) = false;
+      squares[squareNumber(i, j)-1].at(tmp) = false;
    }
    else
       throw rangeError("bad value in clearCell");
@@ -155,9 +156,10 @@ void board::setCell(int i, int j, int val)
          && val <= MaxValue)
    {
       value[i][j] = val;
-      cols.at(i - 1).at(val) = true;
-      rows.at(j - 1).at(val) = true;
-      squares.at(squareNumber(i, j)).at(val) = true;
+      cols[i - 1].at(val) = true;
+      rows[j - 1].at(val) = true;
+	  int sqNum(squareNumber(i, j) - 1);
+      squares[sqNum].at(val) = true;
 
    }
    else
@@ -218,32 +220,33 @@ void board::print()
 
 int main()
 {
-   ifstream fin;
 
-   // Read the sample grid from the file.
-   string fileName = "sudoku.txt";
+	ifstream fin;
 
-   fin.open(fileName.c_str());
-   if (!fin)
-   {
-      cerr << "Cannot open " << fileName << endl;
-      exit(1);
-   }
+	// Read the sample grid from the file.
+	string fileName = "data/sudoku1.txt";
 
-   try
-   {
-      board b1(SquareSize);
+	fin.open(fileName.c_str());
+	if (!fin)
+	{
+		cerr << "Cannot open " << fileName << endl;
+		exit(1);
+	}
 
-      while (fin && fin.peek() != 'Z')
-      {
-	      b1.initialize(fin);
-	      b1.print();
-	      b1.printConflicts();
-      }
-   }
-   catch  (indexRangeError &ex)
-   {
-      cout << ex.what() << endl;
-      exit(1);
-   }
+	try
+	{
+		board b1(SquareSize);
+
+		while (fin && fin.peek() != 'Z')
+		{
+			b1.initialize(fin);
+			b1.print();
+			b1.printConflicts();
+		}
+	}
+	catch (indexRangeError &ex)
+	{
+		cout << ex.what() << endl;
+		exit(1);
+	}
 }

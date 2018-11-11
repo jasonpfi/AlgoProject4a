@@ -34,6 +34,9 @@ class board
       void print();
       bool isBlank(int, int);
       ValueType getCell(int, int);
+      void setCell(int i, int j, int val);
+      void clearCell(int i, int j);
+      bool isSolved();
 
    private:
 
@@ -41,13 +44,39 @@ class board
       // dimension, i.e., they are each (BoardSize+1) * (BoardSize+1)
 
       matrix<ValueType> value;
+
+      // Conflict Vectors
+      vector<vector<bool>> rows;
+      vector<vector<bool>> cols;
+      vector<vector<bool>> squares;
+
 };
 
 board::board(int sqSize)
-   : value(BoardSize+1,BoardSize+1)
+   : value(BoardSize+1,BoardSize+1),
+     rows(BoardSize), cols(BoardSize), squares(BoardSize)
 // Board constructor
 {
    clear();
+}
+
+bool board::isSolved()
+{
+   bool boardFull = true, noColConflict = true, noRowConflict = true,
+        noSqConflict = true;
+
+   for (int i = 1; i <= BoardSize; i++)
+   {
+      for (int j = 1; j <= BoardSize; j++)
+      {
+         boardFull = boardFull && value[i][j] != Blank;
+         nowRowConflict = noRowConflict && rows.at(i - 1).at(j - 1);
+         nowColConflict = noColConflict && cols.at(i - 1).at(j - 1);
+         nowSqConflict = noSqConflict && squares.at(i - 1).at(j - 1);
+      }
+   }
+
+   return boardFull && noColConflict && noRowConflict && noSqConflict;
 }
 
 void board::clear()
@@ -68,14 +97,20 @@ void board::initialize(ifstream &fin)
    clear();
 
    for (int i = 1; i <= BoardSize; i++)
+   {
+      cols.at(i - 1).resize(9);
+      squares.at(i - 1).resize(9);
+      rows.at(i - 1).resize(9);
+
       for (int j = 1; j <= BoardSize; j++)
-	    {
+	   {
 	       fin >> ch;
 
           // If the read char is not Blank
 	      if (ch != '.')
              setCell(i,j,ch-'0');   // Convert char to int
-        }
+      }
+   }
 }
 
 int squareNumber(int i, int j)
@@ -94,6 +129,39 @@ ostream &operator<<(ostream &ostr, vector<int> &v)
    for (int i = 0; i < v.size(); i++)
       ostr << v[i] << " ";
    cout << endl;
+}
+
+void board::clearCell(int i, int j)
+// Sets the value in the cell to blank, updates the conflict list to remove
+// conflicts with this number in the column, row, and square
+{
+   if (i >= 1 && i <= BoardSize && j >= 1 && j <= BoardSize)
+   {
+      ValueType tmp = value[i][j];
+      value[i][j] = Blank;
+      cols.at(i - 1).at(tmp) = false;
+      rows.at(j - 1).at(tmp) = false;
+      squares.at(squareNumber(i, j)).at(tmp) = false;
+   }
+   else
+      throw rangeError("bad value in clearCell");
+}
+
+void board::setCell(int i, int j, int val)
+// Sets the value in a cell. Throws exception if bad values
+// are passed.
+{
+   if (i >= 1 && i <= BoardSize && j >= 1 && j <= BoardSize && val >= MinValue
+         && val <= MaxValue)
+   {
+      value[i][j] = val;
+      cols.at(i - 1).at(val) = true;
+      rows.at(j - 1).at(val) = true;
+      squares.at(squareNumber(i, j)).at(val) = true;
+
+   }
+   else
+      throw rangeError("bad value in setCell");
 }
 
 ValueType board::getCell(int i, int j)
@@ -123,15 +191,15 @@ void board::print()
       if ((i-1) % SquareSize == 0)
       {
          cout << " -";
-	 for (int j = 1; j <= BoardSize; j++)
-	    cout << "---";
+	      for (int j = 1; j <= BoardSize; j++)
+	         cout << "---";
          cout << "-";
-	 cout << endl;
+	      cout << endl;
       }
       for (int j = 1; j <= BoardSize; j++)
       {
-	 if ((j-1) % SquareSize == 0)
-	    cout << "|";
+	      if ((j-1) % SquareSize == 0)
+	         cout << "|";
 	 if (!isBlank(i,j))
 	    cout << " " << getCell(i,j) << " ";
 	 else
@@ -168,9 +236,9 @@ int main()
 
       while (fin && fin.peek() != 'Z')
       {
-	 b1.initialize(fin);
-	 b1.print();
-	 b1.printConflicts();
+	      b1.initialize(fin);
+	      b1.print();
+	      b1.printConflicts();
       }
    }
    catch  (indexRangeError &ex)

@@ -24,6 +24,9 @@
     <ClInclude Include="d_matrix.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="board.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="data\sudoku1.txt" />
@@ -32,6 +35,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="fitsmu-4a.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="board.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

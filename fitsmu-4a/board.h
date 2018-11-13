@@ -2,8 +2,6 @@
 #include <iostream>
 #include "d_matrix.h"
 
-//using namespace std;
-
 typedef int ValueType; // The type of the value in a cell
 const int Blank = -1;  // Indicates that a cell is blank
 
@@ -18,25 +16,26 @@ const int MinValue = 1;
 const int MaxValue = 9;
 
 class board
-	// Stores the entire Sudoku board
+// Stores the entire Sudoku board
 {
 public:
 	board(int);
 	void clear();
-	void initialize(ifstream &fin);
-	void print();
-	bool isBlank(int, int);
-	ValueType getCell(int, int);
-	void setCell(int i, int j, int val);
-	void clearCell(int i, int j);
-	bool isSolved();
-	void printConflicts();
+	void initialize(ifstream &);
+	void print() const;
+	bool isBlank(const int&, const int&) const;
+	ValueType getCell(const int&, const int&) const;
+	void setCell(const int&, const int&, const int&);
+	void clearCell(const int&, const int&);
+	bool isSolved() const;
+	void printConflicts() const;
 
 private:
 
 	// The following matrices go from 1 to BoardSize in each
-	// dimension, i.e., they are each (BoardSize+1) * (BoardSize+1)
+	// dimension, i.e., they are each (BoardSize) * (BoardSize)
 
+	// Sudoku board values
 	matrix<ValueType> value;
 
 	// Conflict Vectors

@@ -4,43 +4,56 @@
 #include "board.h"
 
 int main()
+// main method of program
 {
-
+	// declare input files to read
 	ifstream fin;
+	string files[] = { "data/sudoku1.txt", "data/sudoku2.txt", "data/sudoku3.txt" };
 
-	// Read the sample grid from the file.
-	string fileName = "data/sudoku1.txt";
-	
-	fin.open(fileName.c_str());
-	if (!fin)
+	// cycle through each of the files
+	for (int i = 0; i < 3; i++)
 	{
-		cerr << "Cannot open " << fileName << endl;
-		exit(1);
-	}
+		// Read the grid from the file.
+		string fileName = files[i];
+		std::cout << "Reading " << fileName << std::endl;
 
-	try
-	{
-		board b1(SquareSize);
-
-		while (fin && fin.peek() != 'Z')
+		fin.open(fileName.c_str());
+		if (!fin)
 		{
-			b1.initialize(fin);
-			b1.print();
-			b1.printConflicts();
+			cerr << "Cannot open " << fileName << std::endl;
+			exit(1);
+		}
 
-			if (b1.isSolved())
+		try
+		{
+			board b1(SquareSize);
+
+			while (fin && fin.peek() != 'Z')
 			{
-				std::cout << "The board has been solved!" << endl;
-			}
-			else
-			{
-				std::cout << "The board has NOT been solved." << endl;
+				// initialize board and print information to console
+				b1.initialize(fin);
+				b1.print();
+				b1.printConflicts();
+
+				// check if the board is solved
+				if (b1.isSolved())
+				{
+					std::cout << "The board has been solved!" << std::endl;
+				}
+				else
+				{
+					std::cout << "The board has NOT been solved." << std::endl;
+				}
 			}
 		}
-	}
-	catch (indexRangeError &ex)
-	{
-		std::cout << ex.what() << endl;
-		exit(1);
+		catch (indexRangeError &ex)
+		{
+			std::cout << ex.what() << std::endl;
+			fin.close();
+			exit(1);
+		}
+
+		std::cout << std::endl << std::endl;
+		fin.close();
 	}
 }

@@ -1,3 +1,11 @@
+/**
+* Team: fitsmu
+* Jason Fitch
+* Sam Smucny
+*
+* board.cpp: Implentations of board class functions
+*/
+
 #include <fstream>
 #include "board.h"
 

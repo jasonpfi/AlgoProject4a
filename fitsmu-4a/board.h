@@ -1,3 +1,11 @@
+/**
+* Team: fitsmu
+* Jason Fitch
+* Sam Smucny
+*
+* board.h: Declaration of soduku board class
+*/
+
 #pragma once
 #include <iostream>
 #include "d_matrix.h"
@@ -25,7 +33,7 @@ public:
 	void print() const;
 	bool isBlank(const int&, const int&) const;
 	ValueType getCell(const int&, const int&) const;
-	void setCell(const int&, const int&, const int&);
+	void setCell(const int&, const int&, const ValueType&);
 	void clearCell(const int&, const int&);
 	bool isSolved() const;
 	void printConflicts() const;

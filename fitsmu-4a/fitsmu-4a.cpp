@@ -1,4 +1,11 @@
-// Declarations and functions for project #4
+/**
+* Team: fitsmu
+* Jason Fitch
+* Sam Smucny
+*
+* fitsmu-4a.cpp: Main program file
+*/
+
 #include <iostream>
 #include <fstream>
 #include "board.h"

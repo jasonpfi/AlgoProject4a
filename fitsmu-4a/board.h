@@ -23,8 +23,8 @@ const int BoardSize = SquareSize * SquareSize;
 const int MinValue = 1;
 const int MaxValue = 9;
 
-class board
 // Stores the entire Sudoku board
+class board
 {
 public:
 	board(int);

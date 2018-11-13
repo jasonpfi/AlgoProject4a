@@ -38,7 +38,7 @@ board::board(int sqSize)
 bool board::isSolved() const
 // Checks if a board is completely filled and all the constraints are met.
 {
-	bool 
+	bool
 		boardFull = true,
 		noColConflict = true,
 		noRowConflict = true,
